@@ -1,0 +1,9 @@
+{
+	"autoload": {
+		"psr-4": {
+			"IcyApril\\ChapterOne\\": "src/",
+			"IcyApril\\ChapterTwo\\": "src/",
+			"Hxhking\\Properties\\": "src/"
+		}
+	}
+}

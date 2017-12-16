@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Creating Classes</title>
+</head>
+<body>
+	<h1>Creating Classes</h1>
+	<h2>Creational Patterns</h2>
+	<script type="text/javascript">
+		var Westeros;
+		(function(Westeros){
+			var Ruler = (function(){
+				function Ruler(){
+					this.house = new Westeros.Houses.Targaryen();
+				}
+				return Ruler;
+			})();
+			Westeros.Ruler = Ruler;
+		})(Westeros || (Westeros = {}));
+
+		console.log(Westeros.Ruler);
+
+		// Create Abstract Factory
+		var KingJoffery = (function(){
+			function KingJoffery(){
+
+			}
+			KingJoffery.prototype.makeDecision = function(){
+				console.log("The King has made a decision!");
+			};
+			KingJoffery.prototype.marry = function(){
+				console.log("The king will marry the queen!");
+			};
+			return KingJoffery;
+		})();
+
+		var LordTywin = (function(){
+			function LordTywin(){
+
+			}
+			LordTywin.prototype.makeDecision = function(){
+				console.log("The Lord has made a decision!");
+			};
+			return LordTywin;
+		})();
+
+		var LannisterFactory = (function(){
+			function LannisterFactory(){
+
+			}
+			LannisterFactory.prototype.getKing = function(){
+				return new KingJoffery();
+			};
+			LannisterFactory.prototype.getHandOfTheKing = function(){
+				return new LordTywin();
+			};
+			return LannisterFactory;
+		})();
+
+		var TargaryenFactory = (function(){
+			function TargaryenFactory(){
+
+			}
+			TargaryenFactory.prototype.getKing = function(){
+				return new KingJoffery();
+			};
+			TargaryenFactory.prototype.getHandOfTheKing = function(){
+				return new LordTywin();
+			};
+			return TargaryenFactory;
+		})();
+
+		(new LannisterFactory).getKing().marry();
+		(new LannisterFactory).getHandOfTheKing().makeDecision();
+
+		var CourtSession = (function(){
+			function CourtSession(abstractFactory){
+				this.abstractFactory = abstractFactory;
+				this.COMPLAINT_THRESHOLD = 10;
+			}
+			CourtSession.prototype.complaintPresented = function(complaint){
+				if(complaint.severity < this.COMPLAINT_THRESHOLD){
+					this.abstractFactory.getHandOfTheKing().makeDecision();
+				} else 
+					this.abstractFactory.getKing().makeDecision();
+			};
+			return CourtSession;
+		})();
+
+		var courtSession1 = new CourtSession(new TargaryenFactory());
+			courtSession1.complaintPresented({severity: 8});
+			courtSession1.complaintPresented({severity: 10});
+
+		var courtSession2 = new CourtSession(new LannisterFactory());
+			courtSession2.complaintPresented({severity: 8});
+			courtSession2.complaintPresented({severity: 12});
+
+		// Creating Builder
+		var Event = (function(){
+			function Event(name){
+				this.name = name;
+			}
+			return Event;
+		})();
+		Westeros.Event = Event;
+
+		var Prize = (function(){
+			function Prize(name){
+				this.name = name;
+			}
+			return Prize;
+		})();
+		Westeros.Prize = Prize;
+
+		var Attendee = (function(){
+			function Attendee(name){
+				this.name = name;
+			}
+			return Attendee;
+		})();
+		Westeros.Attendee = Attendee;
+
+		var Tournament = (function(){
+			this.Events = [];
+			function Tournament(){
+				this.events = [];
+				this.attendees = [];
+				this.prizes = [];
+			}
+			return Tournament;
+		})();
+		Westeros.Tournament = Tournament;
+
+		var LannisterTournamentBuilder = (function(){
+			function LannisterTournamentBuilder(){
+
+			}
+			LannisterTournamentBuilder.prototype.build = function(){
+				var tournament = new Tournament();
+				tournament.events.push(new Event("Joust"));
+				tournament.events.push(new Event("Melee"));
+
+				tournament.attendees.push(new Attendee("Jamie"));
+
+				tournament.prizes.push(new Prize("Gold"));
+				tournament.prizes.push(new Prize("More Gold"));
+
+				return tournament;
+			};
+			return LannisterTournamentBuilder;
+		})();
+		Westeros.LannisterTournamentBuilder = LannisterTournamentBuilder;
+
+		var BaratheonTournamentBuilder = (function(){
+			function BaratheonTournamentBuilder(){
+
+			}
+			BaratheonTournamentBuilder.prototype.build = function(){
+				var tournament = new Tournament();
+				tournament.events.push(new Event("Joust"));
+				tournament.events.push(new Event("Melee"));
+
+				tournament.attendees.push(new Attendee("Stannis"));
+				tournament.attendees.push(new Attendee("Robert"));
+
+				return tournament;
+			};
+			return BaratheonTournamentBuilder;
+		})();
+		Westeros.BaratheonTournamentBuilder = BaratheonTournamentBuilder;
+
+		var TournamentBuilder = (function(){
+			function TournamentBuilder(){
+
+			}
+			TournamentBuilder.prototype.build = function(builder){
+				return builder.build();
+			};
+			return TournamentBuilder;
+		})();
+		Westeros.TournamentBuilder = TournamentBuilder;
+
+		console.log((new Westeros.TournamentBuilder).build(new BaratheonTournamentBuilder));
+
+		// Creating Factory
+		var Religion = {};
+		var WateryGod = (function(){
+			function WateryGod(){
+
+			}
+			WateryGod.prototype.prayTo = function(){
+				console.log("I prayed to a Watery God!");
+			};
+			return WateryGod;
+		})();
+		Religion.WateryGod = WateryGod;
+
+		var AncientGods = (function(){
+			function AncientGods(){
+
+			}
+			AncientGods.prototype.prayTo = function(){
+				console.log("I prayed to an Ancient God!");
+			};
+			return AncientGods;
+		})();
+		Religion.AncientGods = AncientGods;
+
+		var DefaultGod = (function(){
+			function DefaultGod(){
+
+			}
+			DefaultGod.prototype.prayTo = function(){
+				console.log("I prayed to a Default God!");
+			};
+			return DefaultGod;
+		})();
+		Religion.DefaultGod = DefaultGod;
+
+		var GodFactory = (function(){
+			function GodFactory(){
+
+			}
+			GodFactory.Build = function(godName){
+				if(godName === "watery")
+					return new WateryGod();
+				if(godName === "ancient")
+					return new AncientGods();
+					return new DefaultGod();
+			};
+			return GodFactory;
+		})();	
+
+		var GodDeterminant = (function(){
+			function GodDeterminant(religionName, prayerPurpose){
+				this.religionName = religionName;
+				this.prayerPurpose = prayerPurpose;
+			}
+			return GodDeterminant;
+		})();
+
+		var Prayer = (function(){
+			function Prayer(){
+
+			}
+			Prayer.prototype.pray = function(godName){
+				GodFactory.Build(godName).prayTo();
+
+			};
+			return Prayer;
+		})();
+
+		(new Prayer).pray("ancient");
+
+		// Creating Singletons
+		 var Westeros;
+		  (function(Westeros){
+		  	var Wall = (function(){
+		  		function Wall(){
+		  			this.height = 0;
+		  			if(Wall._instance)
+		  				return Wall._instance;
+		  			Wall._instance = this;
+		  		}
+		  		Wall.prototype.setHeight = function(height){
+		  			this.height = height;
+		  		};
+		  		Wall.prototype.getStatus = function(){
+		  			console.log("Wall is " + this.height + " meters tall");
+		  		};
+		  		Wall.getInstance = function(){
+		  			if (!Wall._instance){
+		  				Wall._instance = new Wall();
+		  			}
+		  			return Wall._instance;
+		  		};
+		  		Wall._instance = null;
+		  		return Wall;
+		  	})();
+		  	Westeros.Wall = Wall;
+		 })(Westeros || (Westeros = {}));
+
+		 // Creating Prototypes
+		 var Westeros;
+		 (function (Westeros){
+		 	(function (Families){
+		 		var Lannister = (function(){
+		 			function Lannister(){
+
+		 			}
+		 			Lannister.prototype.clone = function(){
+		 				var clone = new Lannister();
+		 				for (var attr in this){
+		 					clone[attr] = this[attr];
+		 				}
+		 				return clone;
+		 			};
+		 			return Lannister;
+		 		})();
+		 		Families.Lannister = Lannister;
+		 	})(Westeros.Families || (Westeros.Families = {}));
+		 	var Families = Westeros.Families;
+		 })(Westeros || (Westeros = {}));
+
+		 var jamie = new Westeros.Families.Lannister();
+		 jamie.swordSkills = 9;
+		 jamie.charm = 6;
+		 jamie.wealth = 10;
+
+		 var tyrion = jamie.clone();
+		 tyrion.charm = 10;
+		 console.log(tyrion);
+	</script>
+</body>
+</html>

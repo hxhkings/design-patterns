@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Structural Patterns</title>
+</head>
+<body>
+	<h1>Structural Patterns</h1>
+	<script type="text/javascript">
+		
+		// Creating Adapter
+		/* var ShipAdapter = (function(){
+				function ShipAdapter(){
+					this._ship = new Ship();
+				}
+				ShipAdapter.prototype.TurnLeft = function(){
+					this._ship.SetRudderAngleTo(-30);
+					this._ship.SetSailAngle(3, 12);
+				};
+				ShipAdapter.prototype.TurnRight = function(){
+					this._ship.SetRudderAngleTo(30);
+					this._ship.SetSailAngle(5, -9);
+				};
+				ShipAdapter.prototype.GoForward = function(){
+					//do something else to the ship
+				};
+				return ShipAdapter;
+			})(); */
+
+			// Creating Bridge
+			/*
+			var OldGods = (function(){
+				function OldGods(){
+
+				}
+				OldGods.prototype.prayTo = function(sacrifice){
+					console.log("We Old Gods hear your prayer");
+				};
+				return OldGods;
+			})();
+			Religion.OldGods = OldGods;
+
+			var DrownedGod = (function(){
+				function DrownedGod(){
+
+				}
+				DrownedGod.prototype.prayTo = function(humanSacrifice){
+					console.log("*BUBBLE* GURGLE");
+				};
+				return DrownedGod;
+			})();
+			Religion.DrownedGod = DrownedGod;
+
+			var SevenGods = (function(){
+				function SevenGods(){
+
+				}
+				SevenGods.prototype.prayTo = function(prayerPurpose){
+					console.log("Sorry there are a lot of us, it gets confusing here. Did you pray for something?");
+				};
+				return SevenGods;
+			})();
+			Religion.SevenGods = SevenGods;
+
+			var OldGodsAdapter = (function(){
+				function OldGodsAdapter(){
+					this._oldGods = new OldGods();
+				}
+				OldGodsAdapter.prototype.prayTo = function(){
+					var sacrifices = new Sacrifice();
+					this._oldGods.prayTo(sacrifice);
+				};
+				return OldGodsAdapter;
+			})();
+			Religion.OldGodsAdapter = OldGodsAdapter;
+
+			var DrownedGodAdapter = (function(){
+				function DrownedGodAdapter(){
+					this._drownedGod = new DrownedGod();
+				}
+				DrownedGodAdapter.prototype.prayTo = function(){
+					var sacrifice = new HumanSacrifice();
+					this._drownedGod.prayTo(sacrifice);
+				};
+				return DrownedGodAdapter;
+			})();
+			Religion.DrownedGodAdapter = DrownedGodAdapter;
+
+			var SevenGodsAdapter = (function(){
+				function SevenGodsAdapter(){
+					this.prayerPurposeProvider = new PrayerPurposeProvider();
+					this._sevenGods = new SevenGods();
+				}
+				SevenGodsAdapter.prototype.prayTo = function(){
+					this._sevenGods.prayTo(this.prayerPurposeProvider);
+					GetPurpose();
+				};
+				return SevenGodsAdapter;
+			})();
+			Religion.SevenGodsAdapter = SevenGodsAdapter;
+
+			var god1 = new Religion.SevenGodsAdapter();
+			var god2 = new Religion.DrownedGodAdapter();
+			var god3 = new Religion.OldGodsAdapter();
+
+			var gods = [god1, god2, god3];
+			for (var i = 0; i < gods.length; i++){
+				gods[i].prayTo();
+			}
+			*/
+
+			// Creating Composite
+			class SimpleIngredient
+			{
+				constructor(name, calories, ironContent, vitaminCContent)
+				{
+					this.name = name;
+					this.calories = calories;
+					this.ironContent = ironContent;
+					this.vitaminCContent = vitaminCContent;
+				}
+				GetName()
+				{
+					return this.name;
+				}
+				GetCalories()
+				{
+					return this.calories;
+				}
+				GetIronContent()
+				{
+					return this.ironContent;
+				}
+				GetVitaminCContent()
+				{
+					return this.vitaminCContent;
+				}
+			}
+
+			class CompoundIngredient
+			{
+				constructor(name)
+				{
+					this.name = name;
+					this.ingredients = new Array();
+				}
+				AddIngredient(ingredient)
+				{
+					this.ingredients.push(ingredient);
+				}
+				GetName()
+				{
+					return this.name;
+				}
+				GetCalories()
+				{
+					let total = 0;
+					for(let i = 0; i < this.ingredients.length; i++)
+					{
+						total += this.ingredients[i].GetCalories();
+					}
+					return total;
+				}
+				GetIronContent()
+				{
+					let total = 0;
+					for (let i = 0; i < this.ingredients.length; i++)
+					{
+						total += this.ingredients[i].GetIronContent();
+					}
+					return total;
+				}
+				GetVitaminCContent()
+				{
+					let total = 0;
+					for (let i = 0; i < this.ingredients.length; i++)
+					{
+						total += this.ingredients[i].GetVitaminCContent();
+					}
+					return total;
+				}
+			}
+
+			let egg = new SimpleIngredient("Egg", 155, 6, 0);
+			let milk = new SimpleIngredient("Milk", 42, 0, 0);
+			let sugar = new SimpleIngredient("Sugar", 387, 0, 0);
+			let rice = new SimpleIngredient("Rice", 370, 8, 0);
+
+			let ricePudding = new CompoundIngredient("Rice Pudding");
+			ricePudding.AddIngredient(egg);
+			ricePudding.AddIngredient(milk);
+			ricePudding.AddIngredient(sugar);
+			ricePudding.AddIngredient(rice);
+
+			console.log("A serving of rice pudding contains:");
+			console.log(ricePudding.GetCalories() + " calories");
+
+			// Creating Decorator
+			class BasicArmor
+			{
+				CalculateDamageFromHit(hit)
+				{
+					return hit.Strength * .2;
+				}
+
+				GetArmorIntegrity()
+				{
+					return 1;
+				}
+			}
+
+			class ChainMail
+			{
+				constructor(decoratedArmor)
+				{
+					this.decoratedArmor = decoratedArmor;
+				}
+				CalculateDamageFromHit(hit)
+				{
+					hit.Strength = hit.Strength * .8;
+					return this.decoratedArmor.CalculateDamageFromHit(hit);
+				}
+				GetArmorIntegrity()
+				{
+					return .9 * this.decoratedArmor.GetArmorIntegrity();
+				}
+
+			}
+
+			let armor = new ChainMail(new BasicArmor());
+			console.log(armor.CalculateDamageFromHit({Location:"head", Weapon:
+						"Sock filled with pennies", Strength:12}));
+
+			// Creating Facade
+			let Transportation  = {};
+			let Ship = (function(){
+				function Ship(){
+
+				}
+				Ship.prototype.TurnLeft = function(){
+
+				};
+				Ship.prototype.TurnRight = function(){
+
+				};
+				Ship.prototype.GoForward = function(){
+
+				};
+				return Ship;
+			})();
+			Transportation.Ship = Ship;
+
+			let Admiral = (function(){
+				function Admiral(){
+
+				}
+				return Admiral;
+			})();
+			Transportation.Admiral = Admiral;
+
+			// build a facade
+			let Fleet = (function(){
+				function Fleet(){
+
+				}
+				Fleet.prototype.setDestination = function(){
+					//pass commands to a series of ships, admirals and
+					//whoever else needs it
+				};
+				Fleet.prototype.resupply = function(){
+
+				};
+				Fleet.prototype.attack = function(destination){
+					//attack a city
+				};
+				return Fleet;
+			})();
+
+			// Creating Flyweights
+			/*let Soldier = (function(){
+				function Soldier(){
+					this.Health = 10;
+					this.FightingAbility = 5;
+					this.Hunger = 0;
+				}
+				return Soldier;
+			})();*/
+
+			class Soldier
+			{
+				constructor()
+				{
+					this.Health = 10;
+					this.FightingAbility = 5;
+					this.Hunger = 0;
+				}
+			}
+
+			let soldier1 = new Soldier();
+			let soldier2 = new Soldier();
+			console.log(soldier1.Health);
+			soldier1.Health = 7;
+			console.log(soldier1.Health);
+			console.log(soldier2.Health);
+			delete soldier1.Health;
+			console.log(soldier2.Health);
+			console.log(soldier1.Health);
+
+			// Creating Proxy
+			class BarrelCalculator
+			{
+				CalculateNumberNeeded(volume)
+				{
+					return Math.ceil(volume / 157);
+				}
+			}
+
+			class DragonBarrelCalculator
+			{
+				CalculateNumberNeeded(volume)
+				{
+					if (this._barrelCalculator == null)
+						this._barrelCalculator = new BarrelCalculator();
+
+					return this._barrelCalculator.CalculateNumberNeeded(volume * .77);
+					
+				}
+			}
+			class PintUnit
+			{
+				constructor(unit, quantity)
+				{
+					this.quantity = quantity;
+				}
+			}
+
+			class PintBarrelCalculator
+			{
+				CalculateNumberNeeded(volume)
+				{
+					if(PintUnit.prototype == Object.getPrototypeOf(volume))
+						//throw some sort of error or compensate
+					if (this._barrelCalculator == null)
+						this._barrelCalculator = new BarrelCalculator();
+
+					return this._barrelCalculator.CalculateNumberNeeded(volume * 1.2);
+					
+				}
+			}
+
+			
+
+
+	</script>
+</body>
+</html>
